@@ -178,3 +178,10 @@ where MaSuatChieu = 6
 select dbo.isValidTimeSuatChieu('2024-4-23 5:30:0', 1,1)
 
 select * from Ghe
+
+select * from GheSuatChieu
+
+select * from VeXemPhim
+select * from NhanVien
+select * from KhachHang
+select * from VeXemPhim
