@@ -53,7 +53,6 @@ begin
 		select @result = sc.GioBatDau from SuatChieu sc where sc.MaSuatChieu = @maSC
 	if @mode = 2
 	begin
-		
 		select @result = DATEADD(MINUTE, p.ThoiLuong, sc.GioBatDau) from SuatChieu sc, Phim p
 		where sc.MaSuatChieu = @maSC
 			and sc.MaPhim = p.MaPhim
@@ -78,7 +77,7 @@ begin
 		if (DATEDIFF(MINUTE, dbo.getTimeSuatChieu(@maSC, 2), @endTime)  <= 0)
 			return 0
 	--Có thể đổi return value để biết là không đủ thời gian để chuẩn bị
-	if (DATEDIFF(MINUTE, @endTime,  dbo.getTimeSuatChieu(@maSC, 1)) < @prepareTime)
+	if (abs(DATEDIFF(MINUTE, @endTime,  dbo.getTimeSuatChieu(@maSC, 1))) < @prepareTime)
 		return 0
 	return 1
 end
@@ -118,8 +117,10 @@ end
 go
 select * from SuatChieu
 
+select DATETIMEFROMPARTS(2024,4,23,14,0,0,0)
+
 declare @status int
-set @status = dbo.isValidTimeSuatChieu('2024-4-23 7:0:0', 1, 1)
+set @status = dbo.isTimeBetweenSuatChieu(5, '2024-4-23 12:0:0', '2024-4-23 13:55:0')
 if @status = 1 print 'Oke deo trung'
 else print 'Trung cmnr'
 
@@ -176,3 +177,4 @@ set GioBatDau = '2024-4-23 7:30:0'
 where MaSuatChieu = 6
 select dbo.isValidTimeSuatChieu('2024-4-23 5:30:0', 1,1)
 
+select * from Ghe
