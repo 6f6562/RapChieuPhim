@@ -39,6 +39,19 @@ insert into Ghe
 values('A',1,1)
 select * from Ghe
 
+--Tạo thủ tục thêm GheSuatChieu khi insert thành công SuatChieu
+go
+create or alter proc createGheSuatChieu (@maSC int, @maPhong int)
+as
+begin
+	declare @trangThai bit
+	declare @giaTien float
+	set @trangThai = 0
+	set @giaTien = 70000
+	insert into GheSuatChieu 
+	select @maSC, g.MaGhe, @trangThai, @giaTien from Ghe g
+	where g.PhongChieuMaPhong = @maPhong
+end
 
 
 go
@@ -136,13 +149,19 @@ begin
 	select @startTime = i.GioBatDau, @maPhim = i.MaPhim, @maPhong = i.PhongChieuMaPhong from inserted i
 	if (dbo.isValidTimeSuatChieu(@startTime, @maPhong, @maPhim) = 1)
 	begin
+	--Tạo trigger thêm GheSuatChieu khi insert thành công Suất Chiếu
 		insert into SuatChieu values(@startTime, @maPhong, @maPhim)
-		print 'Oke them r'
+		declare @maSC int
+		set @maSC = (select Max(MaSuatChieu) from SuatChieu)
+		--exec createGheSuatChieu @maSC, @maPhong
 	end
 	else print 'Trung r khong them duoc'
 end
 --Test trigger
-insert into SuatChieu values('2024-4-23 9:0:0', 1, 1)
+insert into SuatChieu values('2024-4-23 6:0:0', 1, 1)
+select * from SuatChieu
+select * from GheSuatChieu
+delete SuatChieu
 
 --Trigger update cho Suất chiếu
 go
@@ -171,17 +190,26 @@ end
 
 --Test Trigger update
 
-select * from SuatChieu
+
 update SuatChieu
-set GioBatDau = '2024-4-23 7:30:0'
-where MaSuatChieu = 6
+set GioBatDau = '2024-4-23 13:30:0'
+where MaSuatChieu = 12
+select * from SuatChieu
 select dbo.isValidTimeSuatChieu('2024-4-23 5:30:0', 1,1)
 
 select * from Ghe
-
+delete GheSuatChieu
 select * from GheSuatChieu
 
 select * from VeXemPhim
 select * from NhanVien
 select * from KhachHang
 select * from VeXemPhim
+
+select * from NhanVien 
+where TaiKhoan = 'nhanvien1'
+	and MatKhau = 'nhanvien1'
+
+select * from SuatChieu
+
+insert into PhongChieu values('C2', 30)
